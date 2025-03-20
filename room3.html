@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room 3</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .sensor-data {
+            flex: 1;
+            max-width: 50%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .charts {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-container {
+            width: 400px;
+            height: 200px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="sensor-data">
+        <h1>Room 3</h1>
+        <h2>Temperature</h2>
+        <p id="temp3">Loading...</p>
+        <h2>Smoke</h2>
+        <p id="smoke3">Loading...</p>
+        <h2>Flame</h2>
+        <p id="flame3">Loading...</p>
+    </div>
+
+    <div class="charts">
+        <div class="chart-container">
+            <canvas id="tempChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="smokeChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="flameChart"></canvas>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-ENheeyuJs8GFQVzFNq1silxSIQk8TbM",
+            authDomain: "esp32-fire-alarm-a8fc5.firebaseapp.com",
+            databaseURL: "https://esp32-fire-alarm-a8fc5-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "esp32-fire-alarm-a8fc5",
+            storageBucket: "esp32-fire-alarm-a8fc5.firebasestorage.app",
+            messagingSenderId: "138078759671",
+            appId: "1:138078759671:web:06b4af915ffd11839681f2",
+            measurementId: "G-ZZW6Q5DB2S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const tempRef = ref(db, "b2/r3/temp3");
+        const smokeRef = ref(db, "b2/r3/smoke3");
+        const flameRef = ref(db, "b2/r3/flame3");
+
+        onValue(tempRef, snapshot => { document.getElementById("temp3").innerHTML = snapshot.val() + "°C"; });
+        onValue(smokeRef, snapshot => { document.getElementById("smoke3").innerHTML = snapshot.val(); });
+        onValue(flameRef, snapshot => { document.getElementById("flame3").innerHTML = snapshot.val(); });
+
+        class LiveChart {
+            constructor(ctx, label, color) {
+                this.ctx = ctx;
+                this.maxDataPoints = 10;
+
+                const gradient = this.ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, color + "AA");
+                gradient.addColorStop(1, color + "22");
+
+                this.chartData = {
+                    labels: [],
+                    datasets: [{ 
+                        label, 
+                        borderColor: color, 
+                        backgroundColor: gradient, 
+                        data: [],
+                        borderWidth: 3,
+                        pointBackgroundColor: color,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                };
+
+                this.chart = new Chart(this.ctx, {
+                    type: label === "Temperature" ? "line" : "bar",
+                    data: this.chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 500, easing: "easeInOutQuad" },
+                        scales: {
+                            x: { 
+                                ticks: { autoSkip: true, maxTicksLimit: 5, color: "#555" },
+                                grid: { color: "#DDD" }
+                            },
+                            y: { 
+                                min: label === "Temperature" ? null : 0, 
+                                max: label === "Temperature" ? null : 1,
+                                ticks: { color: "#555" },
+                                grid: { color: "#DDD" } 
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: "#333", font: { size: 14 } } }
+                        }
+                    }
+                });
+            }
+
+            updateChart(value) {
+                const timestamp = new Date().toLocaleTimeString();
+                if (this.chartData.labels.length >= this.maxDataPoints) {
+                    this.chartData.labels.shift();
+                    this.chartData.datasets[0].data.shift();
+                }
+                this.chartData.labels.push(timestamp);
+                this.chartData.datasets[0].data.push(value);
+                this.chart.update();
+            }
+        }
+
+        function loadCharts() {
+            const tempChart = new LiveChart(document.getElementById("tempChart").getContext("2d"), "Temperature", "#FF0000");
+            const smokeChart = new LiveChart(document.getElementById("smokeChart").getContext("2d"), "Smoke", "#4B4B4B");
+            const flameChart = new LiveChart(document.getElementById("flameChart").getContext("2d"), "Flame", "#FFA500");
+
+            onValue(tempRef, snapshot => tempChart.updateChart(snapshot.val()));
+            onValue(smokeRef, snapshot => smokeChart.updateChart(snapshot.val()));
+            onValue(flameRef, snapshot => flameChart.updateChart(snapshot.val()));
+        }
+
+        (function injectChartJs() {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            script.onload = loadCharts;
+            document.head.appendChild(script);
+        })();
+    </script>
+
+    
+</body>
+</html>

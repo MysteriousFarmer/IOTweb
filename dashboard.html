@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Basic -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Site Metas -->
+  <link rel="icon" href="../static/images/favicon.png" type="image/gif" />
+
+  <title>Dashboard - Fire Detection</title>
+
+  <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="../static/style/bootstrap.css" />
+  <!-- font awesome style -->
+  <link href="../static/style/font-awesome.min.css" rel="stylesheet" />
+  <!-- Custom styles for this template -->
+  <link href="../static/style/dashboard.css" rel="stylesheet" />
+  <!-- responsive style -->
+  <link href="../static/style/responsive.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- header section strats -->
+  <header class="header_section">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg custom_nav-container">
+        <a class="navbar-brand">
+          <span>
+            Dashboard
+          </span>
+        </a>
+        <div class="" id="">
+        </div>
+      </nav>
+    </div>
+  </header>
+  <!-- end header section -->
+
+  <!-- slider section -->
+  <section class="slider_section position-relative">
+    <div class="slider_bg_box">
+      <img src="../static/images/dashboardbg.jpg" alt="">
+    </div>
+    <div class="slider_bg"></div>
+    <div class="container">
+      <div class="col-md-9 col-lg-8">
+        <div class="detail-box">
+         <h1>
+            FIRE ALARM AND SUPPRESSION SYSTEM
+          </h1> 
+          <a href="building/building1.html" class="slider-link">Building 1</a>
+          <a href="building/building2.html" class="slider-link">Building 2</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end slider section -->
+
+  <!-- info section -->
+  <section class="info_section layout_padding2">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <h4>About Us</h4>
+          <div id="memberCard" class="card" style="width: 18rem;">
+            <div class="img-container" style="width: 100%; height: 200px; overflow: hidden;">
+              <img id="memberImage" src="../static/images/p1.jpg" class="card-img-top" alt=""
+                style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="card-body text-center">
+              <h5 id="memberName" class="card-title">Luc Gia Nghi Anh</h5>
+              <p id="memberID" class="card-text">104240328</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <h4 id="contactus">Contact Us</h4>
+          <div class="info_contact">
+            <p><i class="fa fa-map-marker" aria-hidden="true"></i> Ben Cat, Vietnam</p>
+            <p><i class="fa fa-phone" aria-hidden="true"></i> Call +84...</p>
+            <p><i class="fa fa-envelope"></i> 104240...@student.vgu.edu.vn</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const members = [
+      { name: "Luc Gia Nghi Anh", id: "104240328", img: "../static/images/p1.jpg" },
+      { name: "Luong Nguyen Gia Minh", id: "104240035", img: "../static/images/p2.0.jpg" },
+      { name: "Nguyen Tran Khang", id: "104240009", img: "../static/images/p2.1.jpg" },
+      { name: "Ngo Duc Anh", id: "104240148", img: "../static/images/p2.2.jpg" },
+      { name: "Tran Dang Tri", id: "104240185", img: "../static/images/p2.3.jpg" },
+      { name: "Tran Tri Khiem", id: "104240559", img: "../static/images/p2.4.jpg" },
+      { name: "Tran Huu Duy Hoang", id: "104240552", img: "../static/images/p2.5.jpg" }
+    ];
+
+    let currentIndex = 0;
+
+    function updateCard() {
+      document.getElementById('memberImage').src = members[currentIndex].img;
+      document.getElementById('memberName').innerText = members[currentIndex].name;
+      document.getElementById('memberID').innerText = members[currentIndex].id;
+    }
+
+    function nextMember() {
+      currentIndex = (currentIndex + 1) % members.length;
+      updateCard();
+    }
+
+    setInterval(nextMember, 3000);
+  </script>
+  <!-- end info_section -->
+
+  <!-- jQery -->
+  <script src="../static/scripts/jquery-3.4.1.min.js"></script>
+  <!-- bootstrap js -->
+  <script src="../static/scripts/bootstrap.js"></script>
+  <!-- custom js -->
+  <script src="../static/scripts/custom.js"></script>
+
+</body>
+
+</html>
